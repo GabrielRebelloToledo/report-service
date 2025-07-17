@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CUPOM" pageWidth="589" pageHeight="841" columnWidth="563" leftMargin="13" rightMargin="13" topMargin="8" bottomMargin="20">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="2.420000000000035"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="233"/>
+	<property name="ireport.definition"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="com.sankhya.util.StringUtils"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="NUNOTA" class="java.math.BigDecimal"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT CAB.NUNOTA
+,
+
+(SELECT x.qrcode
+FROM (
+  SELECT XMLTYPE(xml) AS xml_col
+  FROM TGFNFE
+        WHERE NUNOTA = CAB.NUNOTA
+) t,
+XMLTABLE(
+  XMLNAMESPACES(
+    'http://www.portalfiscal.inf.br/nfe' AS "ns"
+  ),
+  '/ns:NFe/ns:infNFeSupl'
+  PASSING t.xml_col
+  COLUMNS
+    qrcode VARCHAR2(4000) PATH 'ns:qrCode'
+) x) AS QR_CODE_LINK
+, CAB.CHAVENFE
+, CAB.DHPROTOC
+, EMP.NOMEFANTASIA
+, CAB.NUMPROTOC
+,('NFC-e n: '||CAB.NUMNOTA||' Serie: '||CAB.SERIENOTA||' '||CAB.DTNEG) AS NUMEROSNOTA
+, CAB.NUMNOTA
+, CAB.OBSERVACAO
+, EMP.RAZAOSOCIAL AS RAZAOEMP
+, CAB.CODVEND
+, VEN.APELIDO
+, CAB.CODPARC
+, CASE WHEN  CAB.CODPARC = 1 THEN 'CONSUMIDOR NÃO IDENTIFICADO' ELSE PAR.NOMEPARC END AS NOMEPARC
+, PAR.RAZAOSOCIAL
+, PAR.TELEFONE
+, PAR.FAX
+, Formatar_Cpf_Cnpj(EMP.CGC) AS CGC
+, EMP.CEP
+, PAR.INSCESTADNAUF
+, ENDE.NOMEEND
+, EMP.NUMEND
+, CID.NOMECID
+, UFS.DESCRICAO
+, UFS.UF
+, BAI.NOMEBAI
+, CAB.VLRNOTA
+, CAB.VLRDESCSERV
+, CAB.VLRDESCTOT
+, CAB.VLRDESCTOTITEM
+, ITE.SEQUENCIA
+, ITE.CODPROD
+, ITE.QTDNEG
+, ITE.VLRUNIT
+, ITE.VLRDESC
+, ITE.VLRTOT
+, ITE.CODVOL
+, PRO.DESCRPROD
+,(ENDE.NOMEEND||', '||EMP.NUMEND||', '||BAI.NOMEBAI||', '||CID.NOMECID||', '||UFS.DESCRICAO||' - '||EMP.CEP) AS NOME_END
+, (select count(*) from tgfite i where i.nunota = cab.nunota) AS TOT_ITEM
+, (SELECT MAX(V.DESCRTIPVENDA) FROM TGFTPV V WHERE V.CODTIPVENDA = CAB.CODTIPVENDA) AS TIPVENDA
+FROM TGFCAB CAB
+, TGFPAR PAR
+, TSIEND ENDE
+, TSIUFS UFS
+, TSICID CID
+, TSIBAI BAI
+, TGFVEI VEI
+, TSIEMP EMP
+, TGFVEN VEN
+, TGFITE ITE
+, TGFPRO PRO
+WHERE CAB.CODPARC = PAR.CODPARC
+AND CAB.CODEMP = EMP.CODEMP
+AND CAB.NUNOTA = ITE.NUNOTA
+AND PRO.CODPROD = ITE.CODPROD
+AND EMP.CODEND = ENDE.CODEND
+AND EMP.CODCID = CID.CODCID
+AND CID.UF = UFS.CODUF
+AND EMP.CODBAI= BAI.CODBAI
+AND CAB.CODVEICULO = VEI.CODVEICULO
+AND VEN.CODVEND = CAB.CODVEND
+AND CAB.NUNOTA = $P{NUNOTA}
+ORDER BY CAB.DTNEG, CAB.NUNOTA, CAB.CODEMP]]>
+	</queryString>
+	<field name="NUNOTA" class="java.lang.Integer"/>
+	<field name="CHAVENFE" class="java.lang.String"/>
+	<field name="DHPROTOC" class="java.sql.Timestamp"/>
+	<field name="NUMPROTOC" class="java.lang.String"/>
+	<field name="NUMEROSNOTA" class="java.lang.String"/>
+	<field name="NUMNOTA" class="java.lang.Integer"/>
+	<field name="OBSERVACAO" class="java.lang.String"/>
+	<field name="RAZAOEMP" class="java.lang.String"/>
+	<field name="CODVEND" class="java.lang.Short"/>
+	<field name="APELIDO" class="java.lang.String"/>
+	<field name="CODPARC" class="java.lang.Integer"/>
+	<field name="NOMEPARC" class="java.lang.String"/>
+	<field name="RAZAOSOCIAL" class="java.lang.String"/>
+	<field name="TELEFONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<field name="CGC" class="java.lang.String"/>
+	<field name="CEP" class="java.lang.String"/>
+	<field name="INSCESTADNAUF" class="java.lang.String"/>
+	<field name="NOMEEND" class="java.lang.String"/>
+	<field name="NUMEND" class="java.lang.String"/>
+	<field name="NOMECID" class="java.lang.String"/>
+	<field name="DESCRICAO" class="java.lang.String"/>
+	<field name="UF" class="java.lang.String"/>
+	<field name="NOMEBAI" class="java.lang.String"/>
+	<field name="VLRNOTA" class="java.lang.Double"/>
+	<field name="VLRDESCSERV" class="java.lang.Double"/>
+	<field name="VLRDESCTOT" class="java.lang.Double"/>
+	<field name="VLRDESCTOTITEM" class="java.lang.Double"/>
+	<field name="SEQUENCIA" class="java.lang.Short"/>
+	<field name="CODPROD" class="java.lang.Integer"/>
+	<field name="QTDNEG" class="java.lang.Double"/>
+	<field name="VLRUNIT" class="java.lang.Double"/>
+	<field name="VLRDESC" class="java.lang.Double"/>
+	<field name="VLRTOT" class="java.lang.Double"/>
+	<field name="CODVOL" class="java.lang.String"/>
+	<field name="DESCRPROD" class="java.lang.String"/>
+	<field name="NOME_END" class="java.lang.String"/>
+	<field name="TOT_ITEM" class="java.lang.Integer"/>
+	<field name="TIPVENDA" class="java.lang.String"/>
+	<field name="QR_CODE_LINK" class="java.lang.String"/>
+	<field name="NOMEFANTASIA" class="java.lang.String"/>
+	<pageHeader>
+		<band height="68">
+			<textField>
+				<reportElement x="-13" y="0" width="189" height="9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["CNPJ: "+$F{CGC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-13" y="9" width="189" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NOMEFANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-13" y="20" width="189" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NOME_END}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-13" y="32" width="189" height="11"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<text><![CDATA[Documento Auxiliar da Nota Fiscal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="43" width="189" height="13"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<text><![CDATA[de Consumidor Eletrônica]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="58" width="13" height="8"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Seq.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="58" width="76" height="8"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código Descrição]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-13" y="56" width="189" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="76" y="58" width="22" height="8"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qtde]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="98" y="58" width="13" height="8"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Un]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="58" width="34" height="8"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[V.unit.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="58" width="31" height="8"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[V. total]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-13" y="67" width="189" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="9" splitType="Stretch">
+			<textField>
+				<reportElement x="-13" y="0" width="13" height="9"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Short"><![CDATA[$F{SEQUENCIA}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="82" height="9"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CODPROD}+" "+$F{DESCRPROD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="98" y="0" width="13" height="9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CODVOL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="111" y="0" width="34" height="9"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VLRUNIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="145" y="0" width="31" height="9"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VLRTOT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="82" y="0" width="16" height="9"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{QTDNEG}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="280" splitType="Stretch">
+			<staticText>
+				<reportElement x="-13" y="3" width="91" height="7"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<text><![CDATA[Qtde. Total de Itens]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="10" width="91" height="7"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<text><![CDATA[Valor Total R$]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="17" width="91" height="7"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor a Pagar R$]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="24" width="91" height="7"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<text><![CDATA[FORMA DE PAGAMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="24" width="98" height="7"/>
+				<box leftPadding="0" rightPadding="2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6" isBold="false"/>
+				</textElement>
+				<text><![CDATA[VALOR PAGO R$]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="-13" y="31" width="91" height="7"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TIPVENDA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="78" y="10" width="98" height="7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VLRNOTA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="78" y="17" width="98" height="7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VLRNOTA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="78" y="31" width="98" height="7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VLRNOTA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="78" y="3" width="98" height="7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Courier New" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{TOT_ITEM}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="-13" y="38" width="189" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="-13" y="39" width="189" height="9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Consulte pela Chave Acesso em]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="48" width="189" height="9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[https://portalsped.fazendo.mg.gov.br/portalnfce]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="57" width="189" height="9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CHAVE DE ACESSO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="261" width="189" height="11"/>
+				<textElement textAlignment="Center">
+					<font fontName="Courier New" size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tributos Totais Incidentes(Lei Federal 12.7412012)0,00]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="-13" y="249" width="189" height="12"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Vendedores: "+$F{CODVEND}+"-"+$F{APELIDO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-13" y="65" width="189" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CHAVENFE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-13" y="85" width="189" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NUMEROSNOTA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-13" y="95" width="97" height="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Protocolo de autorização:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-13" y="105" width="97" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Courier New" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de autorização:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="84" y="95" width="92" height="10"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NUMPROTOC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="84" y="105" width="92" height="9"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Courier New" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{DHPROTOC}]]></textFieldExpression>
+			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement x="17" y="116" width="128" height="97"/>
+				<imageExpression class="java.awt.Image"><![CDATA[br.com.sankhya.util.QRcodeUtil.generate($F{QR_CODE_LINK},100,100)]]></imageExpression>
+			</image>
+			<componentElement>
+				<reportElement positionType="Float" x="0" y="192" width="176" height="43"/>
+				<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code128C" drawText="false" checksumRequired="false" barWidth="1" barHeight="50">
+					<jr:codeExpression><![CDATA[$F{CHAVENFE}]]></jr:codeExpression>
+				</jr:barbecue>
+			</componentElement>
+			<break>
+				<reportElement x="0" y="274" width="576" height="1"/>
+			</break>
+			<textField>
+				<reportElement x="-13" y="75" width="189" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NOMEPARC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
