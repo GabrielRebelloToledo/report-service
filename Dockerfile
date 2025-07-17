@@ -18,4 +18,5 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Comando para rodar o app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
+
