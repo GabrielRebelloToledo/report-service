@@ -10,7 +10,7 @@ COPY . .
 RUN ./mvnw package -DskipTests
 
 # Crie a imagem final
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
