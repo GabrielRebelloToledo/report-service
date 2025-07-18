@@ -46,6 +46,7 @@ public class RelatorioController {
 
         Map<String, Object> parametros = requisicao.getParametros();
         String formato = requisicao.getFormato();
+        parametros.put("SUBREPORT_DIR", "/app/relatorios/" + codrelatorio);
         // String dadoscript = requisicao.getDados();
 
         /*
