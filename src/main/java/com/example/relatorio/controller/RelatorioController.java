@@ -27,9 +27,9 @@ public class RelatorioController {
     }
 
     // 1. Retorna os parâmetros esperados para um relatório
-    @GetMapping("/get-parametros/{relatorio:.+}")
-    public ResponseEntity<List<ParametroRelatorioDTO>> getParametros(@PathVariable String relatorio) {
-        List<ParametroRelatorioDTO> parametros = relatorioService.getParametros(relatorio);
+    @GetMapping("/get-parametros/{relatorio:.+}/{codigo}")
+    public ResponseEntity<List<ParametroRelatorioDTO>> getParametros(@PathVariable String relatorio, @PathVariable String codigo) {
+        List<ParametroRelatorioDTO> parametros = relatorioService.getParametros(relatorio, codigo);
         return ResponseEntity.ok(parametros);
     }
 

@@ -37,10 +37,10 @@ public class RelatorioService {
     @Autowired
     private DataSource dataSource;
 
-    public List<ParametroRelatorioDTO> getParametros(String nomeRelatorio) {
+    public List<ParametroRelatorioDTO> getParametros(String nomeRelatorio, String codrelatorio) {
         List<ParametroRelatorioDTO> parametros = new ArrayList<>();
 
-        String caminhoRelatorio = basePath + File.separator + nomeRelatorio;
+        String caminhoRelatorio = basePath + File.separator + codrelatorio + File.separator + nomeRelatorio;
 
         // Verifica extensão do arquivo
         if (caminhoRelatorio.endsWith(".jrxml")) {
