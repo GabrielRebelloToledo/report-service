@@ -1,15 +1,20 @@
-FROM openjdk:17-jdk-alpine AS build
-RUN mkdir /app
+# Etapa de build
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 
-# Crie o diretório da app
 WORKDIR /app
 
-# Copie tudo para dentro da imagem
-COPY target/*.jar /app/app.jar
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+# Etapa final
+FROM openjdk:17-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar /app/app.jar
 
 EXPOSE 10000
 
-#RUN mvn clean package -DskipTests
-
-
-CMD ["java", ".jar", "/app/app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
