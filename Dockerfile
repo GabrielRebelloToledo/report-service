@@ -9,7 +9,7 @@ COPY target/*.jar /app/app.jar
 
 EXPOSE 10000
 
-RUN mvn clean package -DskipTests
+#RUN mvn clean package -DskipTests
 
 
 CMD ["java", ".jar", "/app/app.jar"]
