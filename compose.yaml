@@ -1,9 +1,10 @@
+version: '3.8'
+
 services:
   server:
-    image: openjdk:17
-    volumes:
-      - ./build/libs/app.jar:/app.jar
-    command: java -jar /app.jar
+    build: .
     ports:
-      - 10000:10000
+      - "10000:10000"
+    volumes:
+      - /opt/data/uploads/relatorios:/opt/data/uploads/relatorios
     restart: always
