@@ -42,7 +42,7 @@ public class RelatorioController {
         System.out.println("Cod Pasta Relatorio: " + requisicao.getCodRelatorio());
 
         String relatorio = requisicao.getRelatorio();
-        String codrelatorio = requisicao.getRelatorio();
+        String codrelatorio = requisicao.getCodRelatorio();
 
         Map<String, Object> parametros = requisicao.getParametros();
         String formato = requisicao.getFormato();

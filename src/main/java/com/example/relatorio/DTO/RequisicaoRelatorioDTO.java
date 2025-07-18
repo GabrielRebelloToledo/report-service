@@ -7,7 +7,7 @@ public class RequisicaoRelatorioDTO {
     private Map<String, Object> parametros;
     private String formato;
     private String dados;
-    private String codrelatorio;
+    private String codRelatorio;
 
     public String getRelatorio() {
         return relatorio;
@@ -42,10 +42,10 @@ public class RequisicaoRelatorioDTO {
     }
 
     public String getCodRelatorio() {
-        return codrelatorio;
+        return codRelatorio;
     }
 
     public void setCodRelatorio(String codrelatorio) {
-        this.codrelatorio = codrelatorio;
+        this.codRelatorio = codrelatorio;
     }
 }
