@@ -1,7 +1,9 @@
- 
 services:
   server:
-    build: .
+    image: openjdk:17
+    volumes:
+      - ./build/libs/app.jar:/app.jar
+    command: java -jar /app.jar
     ports:
       - 10000:10000
     restart: always
