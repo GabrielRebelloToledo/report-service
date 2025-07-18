@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.relatorio.DTO.ParametroRelatorioDTO;
 import com.example.relatorio.DTO.RequisicaoRelatorioDTO;
 import com.example.relatorio.service.RelatorioService;
- 
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,8 @@ public class RelatorioController {
 
     // 1. Retorna os parâmetros esperados para um relatório
     @GetMapping("/get-parametros/{relatorio:.+}/{codigo}")
-    public ResponseEntity<List<ParametroRelatorioDTO>> getParametros(@PathVariable String relatorio, @PathVariable String codigo) {
+    public ResponseEntity<List<ParametroRelatorioDTO>> getParametros(@PathVariable String relatorio,
+            @PathVariable String codigo) {
         List<ParametroRelatorioDTO> parametros = relatorioService.getParametros(relatorio, codigo);
         return ResponseEntity.ok(parametros);
     }
@@ -39,18 +39,24 @@ public class RelatorioController {
 
         System.out.println("Relatório recebido: " + requisicao.getRelatorio());
         System.out.println("Dado criptografado: " + requisicao.getDados());
+        System.out.println("Cod Pasta Relatorio: " + requisicao.getCodRelatorio());
 
         String relatorio = requisicao.getRelatorio();
+        String codrelatorio = requisicao.getRelatorio();
+
         Map<String, Object> parametros = requisicao.getParametros();
         String formato = requisicao.getFormato();
-        //String dadoscript = requisicao.getDados();
+        // String dadoscript = requisicao.getDados();
 
-        /* byte[] arquivo = relatorioService.gerarRelatorioAntigo(relatorio, parametros, formato, dadoscript); */
-        byte[] arquivo = relatorioService. gerarRelatorioAntigo(relatorio, parametros, formato);
+        /*
+         * byte[] arquivo = relatorioService.gerarRelatorioAntigo(relatorio, parametros,
+         * formato, dadoscript);
+         */
+        byte[] arquivo = relatorioService.gerarRelatorioAntigo(relatorio, parametros, formato, codrelatorio);
 
         String contentType = formato.equalsIgnoreCase("XLS") || formato.equalsIgnoreCase("XLSX")
-        ? "application/vnd.ms-excel"
-        : "application/pdf";
+                ? "application/vnd.ms-excel"
+                : "application/pdf";
 
         String fileName = relatorio + "." + formato.toLowerCase();
 

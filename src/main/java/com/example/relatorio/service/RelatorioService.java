@@ -92,14 +92,14 @@ public class RelatorioService {
         return parametros;
     }
 
-    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato) {
+    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato, String codrelatorio) {
 
         System.out.println("Nome do relatório: " + nomeRelatorio);
         System.out.println("Parâmetros: " + parametros);
 
         try (Connection conn = dataSource.getConnection()) {
             // Caminho completo do arquivo no servidor
-            String caminhoRelatorio = basePath + File.separator + nomeRelatorio;
+            String caminhoRelatorio = basePath + File.separator + codrelatorio + File.separator + nomeRelatorio;
             File arquivoRelatorio = new File(caminhoRelatorio);
 
             if (!arquivoRelatorio.exists()) {
