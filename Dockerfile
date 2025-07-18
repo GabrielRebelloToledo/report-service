@@ -1,22 +1,15 @@
-FROM eclipse-temurin:17-jdk AS build
+FROM openjdk:17-jdk-alpine AS build
+RUN mkdir /app
 
 # Crie o diretório da app
 WORKDIR /app
 
 # Copie tudo para dentro da imagem
-COPY . .
+COPY target/*.jar /app/app.jar
 
-# Empacote o projeto com Maven (já estamos no diretório correto)
-RUN ./mvnw package -DskipTests
+EXPOSE 10000
 
-# Crie a imagem final
-FROM eclipse-temurin:17-jdk
+RUN mvn clean package -DskipTests
 
-WORKDIR /app
 
-# Copie o JAR empacotado da fase de build
-COPY --from=build /app/target/*.jar app.jar
-
-# Comando para rodar o app
-ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
-
+CMD ["java", ".jar", "/app/app.jar"]
