@@ -92,33 +92,32 @@ public class RelatorioService {
         return parametros;
     }
 
-    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato, String codrelatorio) {
+    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato,
+            String codrelatorio) {
 
         System.out.println("Nome do relatório: " + nomeRelatorio);
         System.out.println("Parâmetros: " + parametros);
 
         try (Connection conn = dataSource.getConnection()) {
-            // Caminho completo do arquivo no servidor
-            String caminhoRelatorio = basePath + File.separator + codrelatorio + File.separator + nomeRelatorio;
-            File arquivoRelatorio = new File(caminhoRelatorio);
+            // Caminho da pasta do relatório
+            File pastaRelatorio = new File(basePath + File.separator + codrelatorio);
+            if (!pastaRelatorio.exists()) {
+                throw new RuntimeException("Pasta do relatório não encontrada: " + pastaRelatorio.getAbsolutePath());
+            }
 
-            if (!arquivoRelatorio.exists()) {
-                throw new RuntimeException("Arquivo do relatório não encontrado: " + nomeRelatorio);
+            // Compila todos os .jrxml para .jasper
+            compilarRelatoriosDaPasta(pastaRelatorio);
+
+            // Usa o .jasper do relatório principal
+            String nomeJasper = nomeRelatorio.replace(".jrxml", ".jasper");
+            File arquivoJasper = new File(pastaRelatorio, nomeJasper);
+            if (!arquivoJasper.exists()) {
+                throw new RuntimeException("Arquivo .jasper não encontrado: " + arquivoJasper.getAbsolutePath());
             }
 
             JasperReport jasperReport;
-
-            // Verifica a extensão do arquivo
-            if (nomeRelatorio.endsWith(".jrxml")) {
-                try (InputStream input = new FileInputStream(arquivoRelatorio)) {
-                    jasperReport = JasperCompileManager.compileReport(input);
-                }
-            } else if (nomeRelatorio.endsWith(".jasper")) {
-                try (InputStream input = new FileInputStream(arquivoRelatorio)) {
-                    jasperReport = (JasperReport) JRLoader.loadObject(input);
-                }
-            } else {
-                throw new RuntimeException("Extensão de arquivo não suportada: " + nomeRelatorio);
+            try (InputStream input = new FileInputStream(arquivoJasper)) {
+                jasperReport = (JasperReport) JRLoader.loadObject(input);
             }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, conn);
@@ -126,6 +125,22 @@ public class RelatorioService {
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar o relatório '" + nomeRelatorio + "': " + e.getMessage(), e);
+        }
+    }
+
+    private void compilarRelatoriosDaPasta(File pastaRelatorio) {
+        File[] arquivos = pastaRelatorio.listFiles((dir, name) -> name.endsWith(".jrxml"));
+        if (arquivos != null) {
+            for (File jrxml : arquivos) {
+                try {
+                    String pathJasper = jrxml.getAbsolutePath().replace(".jrxml", ".jasper");
+                    JasperCompileManager.compileReportToFile(jrxml.getAbsolutePath(), pathJasper);
+                    System.out.println("Compilado: " + jrxml.getName());
+                } catch (Exception e) {
+                    System.err.println("Erro ao compilar: " + jrxml.getName());
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
