@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.jasperreports.engine.design.JasperDesign;
@@ -93,31 +92,23 @@ public class RelatorioService {
         return parametros;
     }
 
-    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato,
-            String codrelatorio) {
+    public byte[] gerarRelatorioAntigo(String nomeRelatorio, Map<String, Object> parametros, String formato, String codrelatorio) {
 
         System.out.println("Nome do relatório: " + nomeRelatorio);
         System.out.println("Parâmetros: " + parametros);
 
         try (Connection conn = dataSource.getConnection()) {
+            // Caminho completo do arquivo no servidor
             String caminhoRelatorio = basePath + File.separator + codrelatorio + File.separator + nomeRelatorio;
-            String caminhoSubRelatorios = basePath + File.separator + codrelatorio + File.separator;
-
             File arquivoRelatorio = new File(caminhoRelatorio);
 
             if (!arquivoRelatorio.exists()) {
                 throw new RuntimeException("Arquivo do relatório não encontrado: " + nomeRelatorio);
             }
 
-            prepararSubrelatorios(caminhoRelatorio, caminhoSubRelatorios); // só depois de verificar
-
-            if (parametros == null) {
-                parametros = new HashMap<>();
-            }
-            parametros.put("SUBREPORT_DIR", caminhoSubRelatorios);
-
             JasperReport jasperReport;
 
+            // Verifica a extensão do arquivo
             if (nomeRelatorio.endsWith(".jrxml")) {
                 try (InputStream input = new FileInputStream(arquivoRelatorio)) {
                     jasperReport = JasperCompileManager.compileReport(input);
@@ -135,41 +126,6 @@ public class RelatorioService {
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar o relatório '" + nomeRelatorio + "': " + e.getMessage(), e);
-        }
-    }
-
-    public void prepararSubrelatorios(String caminhoRelatorio, String subreportDir) {
-        try {
-            // Carrega o design do relatório principal (.jrxml)
-            JasperDesign design = JRXmlLoader.load(new File(caminhoRelatorio));
-
-            // Percorre os elementos do relatório para encontrar subreports
-            for (JRBand band : new JRBand[] { design.getTitle(), design.getPageHeader(),
-                    design.getDetailSection().getBands()[0], design.getPageFooter(), design.getSummary() }) {
-                if (band != null) {
-                    for (JRElement element : band.getElements()) {
-                        if (element instanceof JRSubreport) {
-                            JRSubreport subreport = (JRSubreport) element;
-                            JRExpression expression = subreport.getExpression();
-
-                            if (expression != null && expression.getText().endsWith(".jasper")) {
-                                String nomeSub = expression.getText().replace("\"", ""); // remove aspas
-                                File arquivoJasper = new File(subreportDir, nomeSub);
-                                File arquivoJrxml = new File(subreportDir, nomeSub.replace(".jasper", ".jrxml"));
-
-                                if (!arquivoJasper.exists() && arquivoJrxml.exists()) {
-                                    // Compila o .jrxml para .jasper
-                                    JasperCompileManager.compileReportToFile(arquivoJrxml.getAbsolutePath(),
-                                            arquivoJasper.getAbsolutePath());
-                                    System.out.println("Subrelatório compilado: " + nomeSub);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao preparar subrelatórios: " + e.getMessage(), e);
         }
     }
 
