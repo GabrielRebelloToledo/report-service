@@ -55,7 +55,7 @@ public class RelatorioService {
                         dto.setNome(param.getName());
                         dto.setDescricao(param.getDescription() != null ? param.getDescription() : param.getName());
                         dto.setTipo(param.getValueClass().getSimpleName());
-                        dto.setObrigatorio(param.getDefaultValueExpression() != null ? true : false);
+                        dto.setObrigatorio(param.getDefaultValueExpression() != null ? false : true);
                         dto.setExibir(param.isForPrompting() == true ? "true" : "false");
                         parametros.add(dto);
                     }
@@ -79,7 +79,7 @@ public class RelatorioService {
                         dto.setNome(param.getName());
                         dto.setDescricao(param.getDescription() != null ? param.getDescription() : param.getName());
                         dto.setTipo(param.getValueClass().getSimpleName());
-                        dto.setObrigatorio(param.getDefaultValueExpression() != null ? true : false);
+                        dto.setObrigatorio(param.getDefaultValueExpression() != null ? false : true);
                         dto.setExibir(param.isForPrompting() == true ? "true" : "false");
                         parametros.add(dto);
                     }
