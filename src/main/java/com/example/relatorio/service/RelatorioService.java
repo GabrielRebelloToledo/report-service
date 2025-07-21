@@ -41,6 +41,9 @@ public class RelatorioService {
         List<ParametroRelatorioDTO> parametros = new ArrayList<>();
 
         String caminhoRelatorio = basePath + File.separator + codrelatorio + File.separator + nomeRelatorio;
+        
+
+        
 
         // Verifica extensão do arquivo
         if (caminhoRelatorio.endsWith(".jrxml")) {

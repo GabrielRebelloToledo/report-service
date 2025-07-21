@@ -1,6 +1,7 @@
 package com.example.relatorio.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import com.example.relatorio.DTO.ParametroRelatorioDTO;
 import com.example.relatorio.DTO.RequisicaoRelatorioDTO;
 import com.example.relatorio.service.RelatorioService;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,13 @@ public class RelatorioController {
         return ResponseEntity.ok(parametros);
     }
 
+    
+
     // 2. Gera o relatório com base nos dados enviados
+
+    @Value("${relatorios.path}")
+    private String basePath;
+
     @PostMapping("/gera-relatorio")
     public ResponseEntity<byte[]> gerarRelatorio(@RequestBody RequisicaoRelatorioDTO requisicao) throws Exception {
 
@@ -44,9 +52,12 @@ public class RelatorioController {
         String relatorio = requisicao.getRelatorio();
         String codrelatorio = requisicao.getCodRelatorio();
 
+        String caminhoSubRelatorios = basePath + File.separator + codrelatorio + File.separator;
+
         Map<String, Object> parametros = requisicao.getParametros();
         String formato = requisicao.getFormato();
-        parametros.put("SUBREPORT_DIR", "/app/relatorios/" + codrelatorio);
+        parametros.put("SUBREPORT_DIR", caminhoSubRelatorios);
+
         // String dadoscript = requisicao.getDados();
 
         /*
